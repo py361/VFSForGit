@@ -18,6 +18,8 @@ namespace GVFS.Common.Git
         private DateTime lastAuthAttempt = DateTime.MinValue;
 
         private string cachedAuthString;
+        private string cachedUsername;
+        private string cachedGitPassword;
 
         private bool isInitialized;
 
@@ -107,6 +109,20 @@ namespace GVFS.Common.Git
 
             errorMessage = null;
             return true;
+        }
+
+        public bool TryGetCredentials(ITracer tracer, out string username, out string password, out string errorMessage)
+        {
+            if (this.TryGetCredentials(tracer, out string _, out errorMessage))
+            {
+                username = this.cachedUsername;
+                password = this.cachedGitPassword;
+                return true;
+            }
+
+            username = null;
+            password = null;
+            return false;
         }
 
         public bool TryInitialize(ITracer tracer, Enlistment enlistment, out string errorMessage)
@@ -220,6 +236,8 @@ namespace GVFS.Common.Git
 
             if (!string.IsNullOrEmpty(gitUsername) && !string.IsNullOrEmpty(gitPassword))
             {
+                this.cachedGitPassword = gitPassword;
+                this.cachedUsername = gitUsername;
                 this.cachedAuthString = Convert.ToBase64String(Encoding.ASCII.GetBytes(gitUsername + ":" + gitPassword));
             }
             else
