@@ -13,8 +13,21 @@ namespace GVFS.Common
             IProductUpgrader upgrader;
             bool isEnabled;
             bool isConfigured;
-
             newUpgrader = null;
+
+            if (NuGetUpgrader.TryCreateNuGetUpgrader(tracer, out isEnabled, out isConfigured, out upgrader, out error))
+            {
+                newUpgrader = upgrader;
+                return true;
+            }
+
+            if (isEnabled && !isConfigured)
+            {
+                // Upgrader is enabled in LocalGVFSConfig. But one or more of the upgrade
+                // config settings are either missing or set incorrectly.
+                return false;
+            }
+
             upgrader = GitHubUpgrader.Create(tracer, out isEnabled, out isConfigured, out error);
             if (upgrader != null)
             {
