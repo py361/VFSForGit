@@ -36,16 +36,6 @@ namespace GVFS.Common
             this.Config = upgraderConfig;
         }
 
-        public GitHubUpgrader(string currentVersion, ITracer tracer)
-        {
-            this.installedVersion = new Version(currentVersion);
-            this.fileSystem = new PhysicalFileSystem();
-            this.tracer = tracer;
-
-            string upgradesDirectoryPath = ProductUpgraderInfo.GetUpgradesDirectoryPath();
-            this.fileSystem.CreateDirectory(upgradesDirectoryPath);
-        }
-
         public GitHubUpgraderConfig Config { get; private set; }
 
         public static GitHubUpgrader Create(
@@ -358,7 +348,7 @@ namespace GVFS.Common
             return false;
         }
 
-        private bool TryInstallUpgrade(GitVersion version, out string consoleError)
+        private bool TryInstallUpgrade(string assetId, string version, out string consoleError)
         {
             bool installSuccess = false;
             EventMetadata metadata = new EventMetadata();

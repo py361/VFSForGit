@@ -81,7 +81,7 @@ namespace GVFS.Common
                         ProcessHelper.GetCurrentProcessVersion(),
                         tracer,
                         upgraderConfig,
-                        ProductUpgrader.GetAssetDownloadsPath(),
+                        ProductUpgraderInfo.GetAssetDownloadsPath(),
                         token);
 
                     return true;
@@ -94,9 +94,7 @@ namespace GVFS.Common
         public Version QueryLatestVersion()
         {
             Version version;
-            string error;
-            string consoleMessage;
-            this.TryGetNewerVersion(out version, out consoleMessage, out error);
+            this.TryGetNewerVersion(out version, out string message);
             return version;
         }
 
@@ -106,19 +104,17 @@ namespace GVFS.Common
             return true;
         }
 
-        public bool CanRunUsingCurrentConfig(out bool isConfigError, out string consoleMessage, out string errorMessage)
+        public bool TryGetConfigAllowsUpgrade(out bool isUpgradeAllowed, out string message)
         {
-            isConfigError = false;
-            consoleMessage = null;
-            errorMessage = null;
+            isUpgradeAllowed = true;
+            message = null;
             return true;
         }
 
-        public bool TryGetNewerVersion(out Version newVersion, out string consoleMessage, out string errorMessage)
+        public bool TryGetNewerVersion(out Version newVersion, out string message)
         {
             newVersion = null;
-            consoleMessage = null;
-            errorMessage = null;
+            message = null;
 
             IList<IPackageSearchMetadata> queryResults = this.QueryFeed(this.Config.PackageFeedName).GetAwaiter().GetResult();
 
@@ -156,9 +152,9 @@ namespace GVFS.Common
                 error = ex.Message;
                 return false;
             }
-            
+
             error = null;
-            return true;            
+            return true;
         }
 
         public bool TryDownloadNewestVersion(out string errorMessage)
@@ -169,7 +165,7 @@ namespace GVFS.Common
 
                 Exception e;
                 bool success = this.TryDeleteDirectory(ProductUpgraderBase.GetTempPath(), out e);
-            
+
                 this.UnzipPackageToTempLocation();
                 this.Manifest = new ReleaseManifestJson();
                 this.Manifest.Read(Path.Combine(this.ExtractedPath, "content", "install-manifest.json"));
@@ -235,6 +231,11 @@ namespace GVFS.Common
         }
 
         public void CleanupDownloadDirectory()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryInitialize(out string errorMessage)
         {
             throw new NotImplementedException();
         }

@@ -11,7 +11,7 @@ namespace GVFS.Common
 
         protected Version installedVersion;
         protected PhysicalFileSystem fileSystem;
-        protected ITracer tracer;    
+        protected ITracer tracer;
 
         private const string ToolsDirectory = "Tools";
         private static readonly string UpgraderToolName = GVFSPlatform.Instance.Constants.GVFSUpgraderExecutableName;
@@ -34,7 +34,7 @@ namespace GVFS.Common
             this.fileSystem = new PhysicalFileSystem();
             this.tracer = tracer;
 
-            string upgradesDirectoryPath = ProductUpgrader.GetUpgradesDirectoryPath();
+            string upgradesDirectoryPath = ProductUpgraderInfo.GetUpgradesDirectoryPath();
             this.fileSystem.CreateDirectory(upgradesDirectoryPath);
         }
 
@@ -43,11 +43,11 @@ namespace GVFS.Common
         // Reason why this is needed - When GVFS.Upgrader.exe is run from C:\ProgramFiles\GVFS folder
         // upgrade installer that is downloaded and run will fail. This is because it cannot overwrite
         // C:\ProgramFiles\GVFS\GVFS.Upgrader.exe that is running. Moving GVFS.Upgrader.exe along with
-        // its dependencies to a temporary location inside ProgramData and running GVFS.Upgrader.exe 
+        // its dependencies to a temporary location inside ProgramData and running GVFS.Upgrader.exe
         // from this temporary location helps avoid this problem.
         public virtual bool TrySetupToolsDirectory(out string upgraderToolPath, out string error)
         {
-            string rootDirectoryPath = ProductUpgrader.GetUpgradesDirectoryPath();
+            string rootDirectoryPath = ProductUpgraderInfo.GetUpgradesDirectoryPath();
             string toolsDirectoryPath = Path.Combine(rootDirectoryPath, ToolsDirectory);
             Exception exception;
             if (TryCreateDirectory(toolsDirectoryPath, out exception))
@@ -113,7 +113,7 @@ namespace GVFS.Common
         protected static string GetTempPath()
         {
             return Path.Combine(
-                Paths.GetServiceDataRoot(ProductUpgrader.RootDirectory),
+                Paths.GetServiceDataRoot(ProductUpgraderInfo.RootDirectory),
                 "InstallerTemp");
         }
 
